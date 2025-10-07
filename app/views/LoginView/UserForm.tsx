@@ -29,9 +29,9 @@ const schema = yup.object().shape({
 });
 
 const UserForm = () => {
-        const { colors } = useTheme();
-        const dispatch = useDispatch();
-        const navigation = useNavigation<NativeStackNavigationProp<OutsideParamList, 'LoginView'>>();
+	const { colors } = useTheme();
+	const dispatch = useDispatch();
+	const navigation = useNavigation<NativeStackNavigationProp<OutsideParamList, 'LoginView'>>();
 
 	const {
 		params: { username }
@@ -45,19 +45,15 @@ const UserForm = () => {
 		setFocus
 	} = useForm<ISubmit>({ mode: 'onChange', resolver: yupResolver(schema), defaultValues: { user: username || '' } });
 
-	const {
-		Accounts_EmailOrUsernamePlaceholder,
-                Accounts_PasswordPlaceholder,
-                isFetching,
-                error,
-                failure
-        } = useAppSelector(state => ({
-                isFetching: state.login.isFetching,
-                Accounts_EmailOrUsernamePlaceholder: state.settings.Accounts_EmailOrUsernamePlaceholder as string,
-                Accounts_PasswordPlaceholder: state.settings.Accounts_PasswordPlaceholder as string,
-                failure: state.login.failure,
-                error: state.login.error && state.login.error.data
-        }));
+	const { Accounts_EmailOrUsernamePlaceholder, Accounts_PasswordPlaceholder, isFetching, error, failure } = useAppSelector(
+		state => ({
+			isFetching: state.login.isFetching,
+			Accounts_EmailOrUsernamePlaceholder: state.settings.Accounts_EmailOrUsernamePlaceholder as string,
+			Accounts_PasswordPlaceholder: state.settings.Accounts_PasswordPlaceholder as string,
+			failure: state.login.failure,
+			error: state.login.error && state.login.error.data
+		})
+	);
 	useEffect(() => {
 		if (failure) {
 			if (error?.error === 'error-invalid-email') {
@@ -69,7 +65,7 @@ const UserForm = () => {
 		}
 	}, [error?.error, failure, getValues, navigation]);
 
-        const submit = ({ password, user }: ISubmit) => {
+	const submit = ({ password, user }: ISubmit) => {
 		if (!isValid) {
 			return;
 		}
@@ -85,10 +81,10 @@ const UserForm = () => {
 					name='user'
 					control={control}
 					label={I18n.t('Username_or_email')}
-                                        placeholder={Accounts_EmailOrUsernamePlaceholder || I18n.t('Username_or_email')}
-                                        keyboardType='number-pad'
-                                        returnKeyType='next'
-                                        onSubmitEditing={() => setFocus('password')}
+					placeholder={Accounts_EmailOrUsernamePlaceholder || I18n.t('Username_or_email')}
+					keyboardType='number-pad'
+					returnKeyType='next'
+					onSubmitEditing={() => setFocus('password')}
 					testID='login-view-email'
 					textContentType='username'
 					autoComplete='username'
@@ -97,12 +93,12 @@ const UserForm = () => {
 					name='password'
 					control={control}
 					label={I18n.t('Password')}
-                                        placeholder={Accounts_PasswordPlaceholder || I18n.t('Password')}
-                                        returnKeyType='send'
-                                        secureTextEntry
-                                        keyboardType='number-pad'
-                                        onSubmitEditing={handleSubmit(submit)}
-                                        testID='login-view-password'
+					placeholder={Accounts_PasswordPlaceholder || I18n.t('Password')}
+					returnKeyType='send'
+					secureTextEntry
+					keyboardType='number-pad'
+					onSubmitEditing={handleSubmit(submit)}
+					testID='login-view-password'
 					textContentType='password'
 					autoComplete='password'
 					importantForAutofill='yes'
@@ -115,7 +111,6 @@ const UserForm = () => {
 					disabled={!isValid}
 				/>
 			</View>
-                        
 		</>
 	);
 };

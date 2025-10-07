@@ -9,18 +9,18 @@ import { OutsideParamList } from '../../stacks/types';
 import UserForm from './UserForm';
 
 const LoginView = () => {
-        const navigation = useNavigation<NativeStackNavigationProp<OutsideParamList, 'LoginView'>>();
+	const navigation = useNavigation<NativeStackNavigationProp<OutsideParamList, 'LoginView'>>();
 
-        const { Accounts_ShowFormLogin } = useAppSelector(state => ({
-                Accounts_ShowFormLogin: state.settings.Accounts_ShowFormLogin as boolean
-        }));
+	const { Accounts_ShowFormLogin } = useAppSelector(state => ({
+		Accounts_ShowFormLogin: state.settings.Accounts_ShowFormLogin as boolean
+	}));
 
-        useLayoutEffect(() => {
-                navigation.setOptions({
-                        title: 'دبستان اندیشه حسینی',
-                        headerRight: undefined
-                });
-        }, [navigation]);
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			title: 'دبستان اندیشه حسینی',
+			headerRight: undefined
+		});
+	}, [navigation]);
 
 	return (
 		<FormContainer testID='login-view'>

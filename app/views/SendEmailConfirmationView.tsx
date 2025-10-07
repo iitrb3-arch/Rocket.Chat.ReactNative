@@ -46,10 +46,10 @@ const SendEmailConfirmationView = () => {
 		setIsFetching(false);
 	};
 
-        useEffect(() => {
-                navigation.setOptions({
-                        title: 'دبستان اندیشه حسینی'
-                });
+	useEffect(() => {
+		navigation.setOptions({
+			title: 'دبستان اندیشه حسینی'
+		});
 		if (route.params?.user) {
 			validate(route.params.user);
 		}
