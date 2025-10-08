@@ -1,25 +1,48 @@
 workflows:
-  rocket_chat_release:
-    name: Build Rocket.Chat Release APK
+  rocket_chat_auto:
+    name: Rocket.Chat Android (auto Release/Debug)
     max_build_duration: 90
     environment:
       node: 18
       java: 17
-      groups:
-        - signing # گروه keystore که Codemagic خودش می‌سازه
       vars:
+        # رم کافی برای بیلد‌های RN سنگین
         GRADLE_OPTS: "-Xmx6144m -Dorg.gradle.jvmargs='-Xmx6144m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8'"
     scripts:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-      - name: Clean Gradle cache
+
+      - name: Build APK (auto: Release if signing vars exist, else Debug)
         script: |
+          set -e
           cd android
-          ./gradlew clean
-      - name: Build signed release APK
-        script: |
-          cd android
-          ./gradlew assembleRelease --no-daemon --stacktrace --warning-mode all
+
+          # اگر متغیرهای امضا موجود باشند => Release امضا شده
+          if [[ -n "${KEYSTORE_FILE:-}" && -n "${KEYSTORE_PASSWORD:-}" && -n "${KEY_ALIAS:-}" && -n "${KEY_PASSWORD:-}" ]]; then
+            echo ">> Signing vars detected → building RELEASE (signed)"
+            # ذخیره keystore از Base64
+            echo "$KEYSTORE_FILE" | base64 -d > release.keystore
+
+            SIGNING_ARGS="-Pandroid.injected.signing.store.file=$PWD/release.keystore \
+                          -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+                          -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+                          -Pandroid.injected.signing.key.password=$KEY_PASSWORD"
+            ./gradlew assembleRelease $SIGNING_ARGS --no-daemon --stacktrace --warning-mode all
+          else
+            echo ">> No signing vars → building DEBUG (installable) with system debug keystore"
+            # دیباگ نصب‌شدنی روی هر گوشی
+            SIGNING_ARGS="-Pandroid.injected.signing.store.file=$HOME/.android/debug.keystore \
+                          -Pandroid.injected.signing.store.password=android \
+                          -Pandroid.injected.signing.key.alias=androiddebugkey \
+                          -Pandroid.injected.signing.key.password=android"
+            ./gradlew assembleDebug $SIGNING_ARGS --no-daemon --stacktrace --warning-mode all
+          fi
+
     artifacts:
-      - android/app/build/outputs/apk/release/*.apk
+      # Release
+      - app/build/outputs/apk/release/*.apk
+      # Debug (هم مسیر قدیمی هم experimental)
+      - app/build/outputs/apk/debug/*.apk
+      - app/build/outputs/apk/experimental/debug/*.apk
+      - app/build/outputs/**/*.apk
