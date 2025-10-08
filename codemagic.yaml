@@ -12,7 +12,7 @@ workflows:
         script: |
           npm install --legacy-peer-deps
 
-      - name: "Build APK (auto: Release if signing vars exist, else Debug)"
+      - name: 'Build APK (auto: Release if signing vars exist, else Debug)'
         script: |
           set -e
           cd android
