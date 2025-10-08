@@ -6,43 +6,42 @@ workflows:
       node: 18
       java: 17
       vars:
-        # رم کافی برای بیلد‌های RN سنگین
         GRADLE_OPTS: "-Xmx6144m -Dorg.gradle.jvmargs='-Xmx6144m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8'"
     scripts:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
 
-      - name: Build APK (auto: Release if signing vars exist, else Debug)
+      - name: "Build APK (auto: Release if signing vars exist, else Debug)"
         script: |
           set -e
           cd android
 
-          # اگر متغیرهای امضا موجود باشند => Release امضا شده
+          # اگر متغیرهای امضا موجود باشد → Release امضاشده
           if [[ -n "${KEYSTORE_FILE:-}" && -n "${KEYSTORE_PASSWORD:-}" && -n "${KEY_ALIAS:-}" && -n "${KEY_PASSWORD:-}" ]]; then
             echo ">> Signing vars detected → building RELEASE (signed)"
-            # ذخیره keystore از Base64
             echo "$KEYSTORE_FILE" | base64 -d > release.keystore
 
-            SIGNING_ARGS="-Pandroid.injected.signing.store.file=$PWD/release.keystore \
-                          -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
-                          -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
-                          -Pandroid.injected.signing.key.password=$KEY_PASSWORD"
-            ./gradlew assembleRelease $SIGNING_ARGS --no-daemon --stacktrace --warning-mode all
+            ./gradlew assembleRelease \
+              -Pandroid.injected.signing.store.file="$PWD/release.keystore" \
+              -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+              -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+              -Pandroid.injected.signing.key.password="$KEY_PASSWORD" \
+              --no-daemon --stacktrace --warning-mode all
+
+          # در غیر این صورت → Debug نصب‌شدنی
           else
             echo ">> No signing vars → building DEBUG (installable) with system debug keystore"
-            # دیباگ نصب‌شدنی روی هر گوشی
-            SIGNING_ARGS="-Pandroid.injected.signing.store.file=$HOME/.android/debug.keystore \
-                          -Pandroid.injected.signing.store.password=android \
-                          -Pandroid.injected.signing.key.alias=androiddebugkey \
-                          -Pandroid.injected.signing.key.password=android"
-            ./gradlew assembleDebug $SIGNING_ARGS --no-daemon --stacktrace --warning-mode all
+            ./gradlew assembleDebug \
+              -Pandroid.injected.signing.store.file="$HOME/.android/debug.keystore" \
+              -Pandroid.injected.signing.store.password=android \
+              -Pandroid.injected.signing.key.alias=androiddebugkey \
+              -Pandroid.injected.signing.key.password=android \
+              --no-daemon --stacktrace --warning-mode all
           fi
 
     artifacts:
-      # Release
       - app/build/outputs/apk/release/*.apk
-      # Debug (هم مسیر قدیمی هم experimental)
       - app/build/outputs/apk/debug/*.apk
       - app/build/outputs/apk/experimental/debug/*.apk
       - app/build/outputs/**/*.apk
