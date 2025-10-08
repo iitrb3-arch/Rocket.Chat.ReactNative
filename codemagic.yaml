@@ -6,7 +6,7 @@ workflows:
       node: 18
       java: 17
       groups:
-        - signing  # گروه keystore که Codemagic خودش می‌سازه
+        - signing # گروه keystore که Codemagic خودش می‌سازه
       vars:
         GRADLE_OPTS: "-Xmx6144m -Dorg.gradle.jvmargs='-Xmx6144m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8'"
     scripts:
