@@ -19,16 +19,16 @@ interface ILanguage {
 }
 
 export const LANGUAGES: ILanguage[] = [
-        {
-                label: 'فارسی',
-                value: 'fa',
-                file: () => require('./locales/fa.json')
-        },
-        {
-                label: 'English',
-                value: 'en',
-                file: () => require('./locales/en.json')
-        }
+	{
+		label: 'فارسی',
+		value: 'fa',
+		file: () => require('./locales/fa.json')
+	},
+	{
+		label: 'English',
+		value: 'en',
+		file: () => require('./locales/en.json')
+	}
 ];
 
 interface ITranslations {
